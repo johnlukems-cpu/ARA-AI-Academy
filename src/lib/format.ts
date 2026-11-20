@@ -38,3 +38,8 @@ export function daysRemaining(expiresAt: string | Date | null | undefined, now: 
   const ms = end.getTime() - now.getTime();
   return ms <= 0 ? 0 : Math.ceil(ms / 86_400_000);
 }
+
+/** Milliseconds from now until the given timestamp (negative when past); null when no timestamp. */
+export function msUntil(value: string | null | undefined): number | null {
+  return value ? new Date(value).getTime() - Date.now() : null;
+}

@@ -1,13 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
 export function MobileMenu({ links, label, footer }: { links: { href: string; label: string }[]; label: string; footer?: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
+  // The menu belongs to the path it was opened on, so navigating closes it.
   const pathname = usePathname();
-  useEffect(() => setOpen(false), [pathname]);
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (fn: (o: boolean) => boolean) => setOpenOn(fn(open) ? pathname : null);
   return (
     <div className="lg:hidden">
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={label} className="rounded-lg p-2 text-slate-700 hover:bg-slate-100">

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import {
   Menu, X, LogOut, LayoutDashboard, BookOpen, Compass, CreditCard, Award, Bell, UserCircle, Users, Wallet,
   GraduationCap, ClipboardCheck, BarChart3, Mail, Settings, ScrollText, Globe, ListChecks,
@@ -67,9 +67,11 @@ export function PortalShell({
   areaLabel?: string;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
+  // The drawer belongs to the path it was opened on, so navigating closes it.
   const pathname = usePathname();
-  useEffect(() => setOpen(false), [pathname]);
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (v: boolean) => setOpenOn(v ? pathname : null);
 
   const sidebar = (
     <div className="flex h-full flex-col bg-ink px-4 py-5">
