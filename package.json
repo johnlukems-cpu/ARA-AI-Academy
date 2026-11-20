@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:db": "node --test tests/db/workflows.test.mjs",
+    "typecheck": "next typegen && tsc --noEmit",
+    "admin:promote": "node scripts/promote-admin.mjs",
+    "seed:generate": "node scripts/generate-seed.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

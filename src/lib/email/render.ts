@@ -13,23 +13,28 @@ export function interpolate(template: string, vars: Record<string, string | numb
 }
 
 const safeUrl = (u: string) => (/^(https?:|mailto:)/i.test(u) ? u : "#");
+type Vars = Record<string, string | number | null | undefined>;
 
-function inline(html: string): string {
+/**
+ * Markdown-lite formatting is applied to the (escaped) template BEFORE variables are filled in,
+ * so values such as a student's name or contact message can never create links or markup.
+ */
+function inline(html: string, vars: Vars): string {
   return html
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, text: string, url: string) => `<a href="${safeUrl(url)}" style="color:#4F46E5">${text}</a>`);
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, text: string, url: string) => `<a href="${safeUrl(interpolate(url, vars, true))}" style="color:#4F46E5">${text}</a>`);
 }
 
 /** Render template body to { html, text }. Template text and variables are HTML-escaped first. */
-export function renderBody(body: string, vars: Record<string, string | number | null | undefined>, accent = "#4F46E5") {
-  const filled = interpolate(escapeHtml(body), vars, true);
-  const blocks = filled.split(/\n{2,}/).map((b) => b.trim()).filter(Boolean);
+export function renderBody(body: string, vars: Vars, accent = "#4F46E5") {
+  const blocks = escapeHtml(body).split(/\n{2,}/).map((b) => b.trim()).filter(Boolean);
   const htmlBlocks = blocks.map((block) => {
     const btn = block.match(/^\[\[button:([^|\]]+)\|([^\]]+)\]\]$/);
     if (btn) {
-      return `<p style="margin:28px 0"><a href="${safeUrl(btn[2].trim())}" style="background:${accent};color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:600;display:inline-block">${btn[1].trim()}</a></p>`;
+      const href = safeUrl(interpolate(btn[2].trim(), vars, true));
+      return `<p style="margin:28px 0"><a href="${href}" style="background:${accent};color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:600;display:inline-block">${interpolate(btn[1].trim(), vars, true)}</a></p>`;
     }
-    return `<p style="margin:0 0 16px;line-height:1.6">${inline(block).replace(/\n/g, "<br>")}</p>`;
+    return `<p style="margin:0 0 16px;line-height:1.6">${interpolate(inline(block, vars), vars, true).replace(/\n/g, "<br>")}</p>`;
   });
   const textPlain = interpolate(body, vars)
     .replace(/\[\[button:([^|\]]+)\|([^\]]+)\]\]/g, "$1: $2")

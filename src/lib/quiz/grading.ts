@@ -29,6 +29,7 @@ export function normalizeText(s: string): string {
     .toLowerCase()
     .replace(/[“”"'’`]/g, "")
     .replace(/\s+/g, " ")
+    .trim()
     .replace(/[.!?,;:]+$/g, "")
     .trim();
 }
