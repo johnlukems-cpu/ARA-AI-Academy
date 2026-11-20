@@ -46,6 +46,14 @@ export function ButtonLink({
   children,
   ...rest
 }: { href: string; variant?: Variant; size?: Size; className?: string; children: React.ReactNode } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">) {
+  // API routes (downloads, PDFs) need a full browser request, not client-side navigation.
+  if (href.startsWith("/api/")) {
+    return (
+      <a href={href} className={buttonClass(variant, size, className)} {...rest}>
+        {children}
+      </a>
+    );
+  }
   return (
     <Link href={href} className={buttonClass(variant, size, className)} {...rest}>
       {children}
